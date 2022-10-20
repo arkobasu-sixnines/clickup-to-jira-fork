@@ -42,15 +42,21 @@ class ClickUpToJIRAConverter:
         :return: The dataclass Ticket
         :rtype: Ticket
         """
-        logger.info(f"converting ticket {ticket.name}")
+        logger.info(f"converting ticket {0}".format(ticket))
 
         # Prepare entities for ticket
-        ticket_type = ",".join([tag.name for tag in ticket.tags])
-        ticket_description = self._get_converted_description(
-            ticket.description
-        )
-        ticket_status = ticket.status.status
-        subtasks = self._get_converted_subtasks(ticket.linked_tasks)
+        try:
+            ticket_type = ",".join([tag.name for tag in ticket.tags])
+            ticket_description = self._get_converted_description(
+                ticket.description
+            )
+            if (ticket_description is None or ticket_description == ''):
+                ticket_description = "Ernest insists - Add a description you filthy animal!"
+            ticket_status = ticket.status.status
+            subtasks = self._get_converted_subtasks(ticket.linked_tasks)
+        except:
+            logger.warn("Error in preparing entities for ticket")
+            return        
 
         # Handle assignees
         if ticket.assignees:
@@ -63,7 +69,7 @@ class ClickUpToJIRAConverter:
             id=ticket.id,
             type=ticket_type,
             project=os.getenv("JIRA_PROJECT"),
-            title=ticket.name,
+            title=ticket.name.strip('"'),
             description=ticket_description,
             subtasks=subtasks,
             status=ticket_status,

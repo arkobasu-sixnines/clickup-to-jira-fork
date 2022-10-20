@@ -24,6 +24,7 @@ def main():
 
     # Get tickets from ClickUp
     tickets = click_up_handler.get_click_up_tickets()
+    print("Number of tickets retrieved from Clickup: {0}".format(len(tickets)))
 
     # Convert them to JIRA tickets
     new_tickets = converter.convert(tickets)
