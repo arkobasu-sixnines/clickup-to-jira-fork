@@ -42,7 +42,7 @@ class ClickUpToJIRAConverter:
         :return: The dataclass Ticket
         :rtype: Ticket
         """
-        logger.info(f"converting ticket {0}".format(ticket))
+        logger.info(f"converting ticket {ticket}")
 
         # Prepare entities for ticket
         try:
@@ -54,15 +54,14 @@ class ClickUpToJIRAConverter:
                 ticket_description = "Ernest insists - Add a description you filthy animal!"
             ticket_status = ticket.status.status
             subtasks = self._get_converted_subtasks(ticket.linked_tasks)
-        except:
-            logger.warn("Error in preparing entities for ticket")
+            # Handle assignees
+            if ticket.assignees:
+                ticket_assignee = ticket.assignees[0]
+            else:
+                ticket_assignee = None
+        except Exception as e:
+            logger.warn(f"Error in preparing entities for ticket: {ticket}")
             return        
-
-        # Handle assignees
-        if ticket.assignees:
-            ticket_assignee = ticket.assignees[0]
-        else:
-            ticket_assignee = None
 
         # Return the new Ticket
         return Ticket(
